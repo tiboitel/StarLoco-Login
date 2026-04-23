@@ -59,6 +59,11 @@ public class PacketHandler {
                 }
 
             case WAIT_PASSWORD: // ok
+                if (packet.startsWith("#Z") && Config.zaapEnabled) {
+                    // Zaap authentication flow: #Z\naccountName\nzaapToken
+                    client.setStatus(LoginClient.Status.WAIT_ZAAP_AUTH);
+                    return;
+                }
                 if (packet.length() < 3) {
                     Console.instance.write("[" + client.getIoSession().getId() + "] Sending of packet '" + packet + "' to verify the password. The client going to be kicked.");
                     client.send("AlEf");
@@ -68,6 +73,11 @@ public class PacketHandler {
 
                 Console.instance.write("[" + client.getIoSession().getId() + "] Verification of password '" + packet + "'.");
                 Password.verify(client, packet);
+                break;
+
+            case WAIT_ZAAP_AUTH:
+                Console.instance.write("[" + client.getIoSession().getId() + "] Verifying Zaap auth token.");
+                ZaapAuth.verify(client, packet);
                 break;
 
             case WAIT_NICKNAME: // ok

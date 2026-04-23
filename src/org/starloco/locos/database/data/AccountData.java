@@ -113,6 +113,36 @@ public class AccountData extends AbstractDAO<Account> {
         }
     }
 
+    public Account loadByZaapToken(String zaapToken) {
+        Account account = null;
+        try {
+            String query = "SELECT * FROM `world_accounts` WHERE zaap_token = '" + zaapToken + "';";
+            Result result = super.getData(query);
+            account = loadFromResultSet(result.resultSet);
+            close(result);
+            if (account != null) {
+                logger.debug("Account with zaapToken {} successfully loaded", zaapToken);
+            } else {
+                logger.debug("Account with zaapToken {} not found", zaapToken);
+            }
+        } catch (Exception e) {
+            logger.error("Can't load account with zaapToken " + zaapToken, e);
+        }
+        return account;
+    }
+
+    public boolean consumeZaapToken(int guid) {
+        try {
+            String query = "UPDATE `world_accounts` SET zaap_token = NULL WHERE guid = '" + guid + "';";
+            PreparedStatement statement = getPreparedStatement(query);
+            execute(statement);
+            return true;
+        } catch (Exception e) {
+            logger.error("SQL ERROR consuming zaapToken", e);
+        }
+        return false;
+    }
+
     public boolean isBanned(String ip) {
         boolean banned = false;
         try {
@@ -133,7 +163,7 @@ public class AccountData extends AbstractDAO<Account> {
     Account loadFromResultSet(ResultSet resultSet)
             throws SQLException {
         if (resultSet.next())
-            return new Account(resultSet.getInt("guid"), resultSet.getString("account").toLowerCase(), resultSet.getString("pass"), resultSet.getString("pseudo"), resultSet.getString("question"), resultSet.getByte("logged"), resultSet.getLong("subscribe"), resultSet.getByte("banned"), resultSet.getLong("bannedTime"));
+            return new Account(resultSet.getInt("guid"), resultSet.getString("account").toLowerCase(), resultSet.getString("pass"), resultSet.getString("pseudo"), resultSet.getString("question"), resultSet.getByte("logged"), resultSet.getLong("subscribe"), resultSet.getByte("banned"), resultSet.getLong("bannedTime"), resultSet.getString("zaap_token"));
         return null;
     }
 }
