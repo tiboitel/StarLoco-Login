@@ -38,7 +38,9 @@ public class LoginClient {
     }
 
     public void kick() {
-        Config.loginServer.clients.remove(this.getAccount().getName());
+        if (this.account != null) {
+            Config.loginServer.clients.remove(this.getAccount().getName());
+        }
         this.ioSession.close(true);
     }
 

@@ -8,7 +8,7 @@ import org.starloco.locos.object.Account;
 
 class ZaapAuth {
 
-    static void verify(LoginClient client, String data) {
+    static void verify(LoginClient client, String zaapToken) {
         if (!Config.zaapEnabled) {
             Console.instance.write("[" + client.getIoSession().getId() + "] Zaap auth is disabled. Kicking client.");
             client.send("AlEf");
@@ -16,18 +16,14 @@ class ZaapAuth {
             return;
         }
 
-        String[] parts = data.split("\n");
-        if (parts.length != 2) {
-            Console.instance.write("[" + client.getIoSession().getId() + "] Invalid Zaap auth format: '" + data + "'. Kicking client.");
+        if (zaapToken == null || zaapToken.isEmpty()) {
+            Console.instance.write("[" + client.getIoSession().getId() + "] Empty Zaap token. Kicking client.");
             client.send("AlEf");
             client.kick();
             return;
         }
 
-        String accountName = parts[0].toLowerCase();
-        String zaapToken = parts[1];
-
-        Console.instance.write("[" + client.getIoSession().getId() + "] Verifying Zaap auth for account '" + accountName + "'.");
+        Console.instance.write("[" + client.getIoSession().getId() + "] Verifying Zaap auth token.");
 
         Account account = Main.database.getAccountData().loadByZaapToken(zaapToken);
 
@@ -38,12 +34,7 @@ class ZaapAuth {
             return;
         }
 
-        if (!account.getName().equals(accountName)) {
-            Console.instance.write("[" + client.getIoSession().getId() + "] ZaapToken account mismatch. Kicking client.");
-            client.send("AlEf");
-            client.kick();
-            return;
-        }
+        String accountName = account.getName();
 
         if (Config.loginServer.clients.containsKey(accountName)) {
             Console.instance.write("[" + client.getIoSession().getId() + "] Account already logging in. Kicking existing session.");
