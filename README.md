@@ -1,5 +1,5 @@
 # StarLoco - Login
-The most advanced public 1.47.3e dofus emulator written in Java 8.
+The most advanced public 1.43.7 dofus emulator written in Java 8.
 
 ## Summary
 - Requirements
