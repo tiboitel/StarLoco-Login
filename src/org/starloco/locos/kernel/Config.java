@@ -67,7 +67,7 @@ public class Config {
             Config.databaseUser = properties.getProperty(Params.LOGIN_DB_USER.toString()); i++;
             Config.databasePass = properties.getProperty(Params.LOGIN_DB_PASS.toString()); i++;
             Config.databaseName = properties.getProperty(Params.LOGIN_DB_NAME.toString()); i++;
-            Config.zaapEnabled = Boolean.parseBoolean(properties.getProperty(Params.ZAAP_ENABLED.toString()));
+            Config.zaapEnabled = Boolean.parseBoolean(properties.getProperty(Params.ZAAP_ENABLED.toString())); i++;
         } catch(Exception e) {
             Console.instance.write(" > Config : not found or invalid parameters! (line " + i + ")");
             verify(name);
