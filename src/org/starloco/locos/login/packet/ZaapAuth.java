@@ -41,8 +41,12 @@ class ZaapAuth {
             Config.loginServer.clients.get(accountName).kick();
         }
 
-        Main.database.getAccountData().consumeZaapToken(account.getUUID());
-        Main.database.getAccountData().resetLogged(account.getUUID(), 0);
+        if (!Main.database.getAccountData().consumeZaapToken(account.getUUID())) {
+            Console.instance.write("[" + client.getIoSession().getId() + "] Failed to consume Zaap token for account '" + accountName + "'. Kicking client.");
+            client.send("AlEf");
+            client.kick();
+            return;
+        }
 
         client.setAccount(account);
         account.setClient(client);

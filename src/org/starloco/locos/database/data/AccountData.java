@@ -116,25 +116,28 @@ public class AccountData extends AbstractDAO<Account> {
     public Account loadByZaapToken(String zaapToken) {
         Account account = null;
         try {
-            String query = "SELECT * FROM `world_accounts` WHERE zaap_token = '" + zaapToken + "';";
-            Result result = super.getData(query);
-            account = loadFromResultSet(result.resultSet);
-            close(result);
+            String query = "SELECT * FROM `world_accounts` WHERE zaap_token = ?;";
+            PreparedStatement statement = getPreparedStatement(query);
+            statement.setString(1, zaapToken);
+            ResultSet resultSet = statement.executeQuery();
+            account = loadFromResultSet(resultSet);
+            close(statement);
             if (account != null) {
-                logger.debug("Account with zaapToken {} successfully loaded", zaapToken);
+                logger.debug("Account with zaap token successfully loaded");
             } else {
-                logger.debug("Account with zaapToken {} not found", zaapToken);
+                logger.debug("Account with zaap token not found");
             }
         } catch (Exception e) {
-            logger.error("Can't load account with zaapToken " + zaapToken, e);
+            logger.error("Can't load account with zaap token", e);
         }
         return account;
     }
 
     public boolean consumeZaapToken(int guid) {
         try {
-            String query = "UPDATE `world_accounts` SET zaap_token = NULL WHERE guid = '" + guid + "';";
+            String query = "UPDATE `world_accounts` SET zaap_token = NULL WHERE guid = ?;";
             PreparedStatement statement = getPreparedStatement(query);
+            statement.setInt(1, guid);
             execute(statement);
             return true;
         } catch (Exception e) {
