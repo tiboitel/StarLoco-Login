@@ -8,6 +8,7 @@ import org.starloco.locos.database.AbstractDAO;
 import org.starloco.locos.database.Result;
 import org.starloco.locos.object.Account;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -115,13 +116,15 @@ public class AccountData extends AbstractDAO<Account> {
 
     public Account loadByZaapToken(String zaapToken) {
         Account account = null;
+        Connection connection = null;
+        PreparedStatement statement = null;
         try {
             String query = "SELECT * FROM `world_accounts` WHERE zaap_token = ?;";
-            PreparedStatement statement = getPreparedStatement(query);
+            connection = getConnection();
+            statement = connection.prepareStatement(query);
             statement.setString(1, zaapToken);
             ResultSet resultSet = statement.executeQuery();
             account = loadFromResultSet(resultSet);
-            close(statement);
             if (account != null) {
                 logger.debug("Account with zaap token successfully loaded");
             } else {
@@ -129,6 +132,9 @@ public class AccountData extends AbstractDAO<Account> {
             }
         } catch (Exception e) {
             logger.error("Can't load account with zaap token", e);
+        } finally {
+            close(statement);
+            close(connection);
         }
         return account;
     }

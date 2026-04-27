@@ -15,6 +15,9 @@ AGENTS.md
 # AI memory (session-only)
 docs/ai/
 
+# Project docs (local-only, do not commit)
+docs/
+
 # Build dependencies (downloaded locally)
 gradle-8.11.1/
 jdk-11.0.24+8/
